@@ -2,135 +2,54 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Cartoon Shrey</title>
+  <title>3D Shrey Avatar</title>
   <style>
-    body {
-      background: #f2f2f2;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      font-family: sans-serif;
-    }
-
-    .character {
-      position: relative;
-      width: 120px;
-      height: 280px;
-    }
-
-    .head {
-      width: 70px;
-      height: 70px;
-      background: #e0b27a; /* skin tone */
-      border-radius: 50%;
-      position: absolute;
-      top: 0;
-      left: 25px;
-      border: 2px solid #444;
-    }
-
-    .hair {
-      position: absolute;
-      top: 0;
-      left: 10px;
-      width: 50px;
-      height: 35px;
-      background: #222;
-      border-radius: 30% 30% 10% 10%;
-    }
-
-    .eye {
-      width: 8px;
-      height: 8px;
-      background: #000;
-      border-radius: 50%;
-      position: absolute;
-      top: 25px;
-    }
-
-    .eye.left { left: 18px; }
-    .eye.right { left: 42px; }
-
-    .mouth {
-      width: 20px;
-      height: 10px;
-      border-bottom: 3px solid #000;
-      position: absolute;
-      top: 50px;
-      left: 25px;
-    }
-
-    .body {
-      width: 60px;
-      height: 110px;
-      background: #eaeaea; /* striped shirt approximation */
-      position: absolute;
-      top: 70px;
-      left: 30px;
-      border: 2px solid #444;
-    }
-
-    .left-arm, .right-arm {
-      width: 20px;
-      height: 70px;
-      background: #e0b27a;
-      position: absolute;
-      top: 80px;
-      transform-origin: top;
-      border: 2px solid #444;
-    }
-
-    .left-arm {
-      left: 0;
-      animation: wave 2s infinite ease-in-out;
-    }
-
-    .right-arm {
-      left: 100px;
-    }
-
-    .left-leg, .right-leg {
-      width: 20px;
-      height: 70px;
-      background: #333;
-      position: absolute;
-      top: 180px;
-      border: 2px solid #444;
-    }
-
-    .left-leg { left: 30px; }
-    .right-leg { left: 70px; }
-
-    @keyframes wave {
-      0% { transform: rotate(0deg); }
-      50% { transform: rotate(-25deg); }
-      100% { transform: rotate(0deg); }
-    }
+    body { margin: 0; }
+    canvas { display: block; }
   </style>
 </head>
 <body>
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js';
+    import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/loaders/GLTFLoader.js';
+    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/controls/OrbitControls.js';
 
-  <div class="character" onclick="sayHi()">
-    <div class="head">
-      <div class="hair"></div>
-      <div class="eye left"></div>
-      <div class="eye right"></div>
-      <div class="mouth"></div>
-    </div>
-    <div class="body"></div>
-    <div class="left-arm"></div>
-    <div class="right-arm"></div>
-    <div class="left-leg"></div>
-    <div class="right-leg"></div>
-  </div>
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 1.6, 3);
 
-  <script>
-    function sayHi() {
-      alert("Hi! I'm Cartoon Shrey 😄");
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+
+    // Lighting
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(1, 2, 3);
+    scene.add(light);
+
+    // Load 3D Avatar Model
+    const loader = new GLTFLoader();
+    loader.load('avatar.glb', function (gltf) {
+      const model = gltf.scene;
+      scene.add(model);
+      animate();
+    }, undefined, function (error) {
+      console.error('Error loading model:', error);
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
     }
-  </script>
 
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
 </body>
 </html>
